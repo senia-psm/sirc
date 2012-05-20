@@ -33,25 +33,25 @@ object Parser extends JavaTokenParsers{
 
   def hostaddr: Parser[String] = ip4addr | ipv6addr
   def ip4addr: Parser[String] = """\d{1,3}""".r ~ repN(3, "." ~> """\d{1,3}""".r) ^? (
-    { case a ~ (b :: c :: d :: Nil) if isIpv4(a, b, c, d) => Seq(a,b,c,d).mkString(".") },
-    { case a ~ bs => "Not a valid ipv4 address: " + (a :: bs).mkString(".")}
+      { case a ~ (b :: c :: d :: Nil) if isIpv4(a, b, c, d) => Seq(a,b,c,d).mkString(".") },
+      { case a ~ bs => "Not a valid ipv4 address: " + (a :: bs).mkString(".")}
     )
   def ipv6addr: Parser[String] = repsep("""[\da-fA-F]{1,4}""".r, ":") ~ "::".? ~ repsep("""[\da-fA-F]{1,4}""".r, ":") ^? (
-    { case as ~ b ~ cs if isIpv6(as, b, cs) => as.mkString(":") + b.mkString + cs.mkString(":")},
-    { case as ~ b ~ cs => "Not a valid ipv6 address: " + as.mkString(":") + b.mkString + cs.mkString(":")}
+      { case as ~ b ~ cs if isIpv6(as, b, cs) => as.mkString(":") + b.mkString + cs.mkString(":")},
+      { case as ~ b ~ cs => "Not a valid ipv6 address: " + as.mkString(":") + b.mkString + cs.mkString(":")}
     )
 
   def params: Parser[Seq[String]] = paramsMax | paramsComm
   def paramsMax: Parser[Seq[String]] = repN(14, " " ~> middle) ~ opt(" " ~> ":".? ~ trailing ) ^? (
-    {
-      case ms ~ Some(None ~ t) if t.head != ':' => ms :+ t
-      case ms ~ ot => ms ++ ot.map{_._2}
-    },
-    {"Leading \":\" don't belongs to last parameter: " + _}
+      {
+        case ms ~ Some(None ~ t) if t.head != ':' => ms :+ t
+        case ms ~ ot => ms ++ ot.map{_._2}
+      },
+      {"Leading \":\" don't belongs to last parameter: " + _}
     )
   def paramsComm: Parser[Seq[String]] = rep(" " ~> middle) ~ opt(" :" ~> trailing ) ^? (
-    { case ms ~ t if ms.length <= 14 => ms ++ t },
-    { "Too many parameters: " + _ }
+      { case ms ~ t if ms.length <= 14 => ms ++ t },
+      { "Too many parameters: " + _ }
     )
   lazy val middle: Parser[String] = """[^ :\n][^ \n]*""".r
   lazy val trailing: Parser[String] = """[^\n]*""".r
