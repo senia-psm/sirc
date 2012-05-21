@@ -42,7 +42,9 @@ class IrcSocket(socket: Socket, listeners: ActorRef*) extends Actor with ActorLo
           log.debug("IOException: " + t)
           context.stop(self)
         case Right(Some(s)) => context.parent ! Msg(s)
-        case Right(None) => log.warning("Null string message.")
+        case Right(None) =>
+          log.warning("Null string message.")
+          context.parent ! Close
       }
     }
 
