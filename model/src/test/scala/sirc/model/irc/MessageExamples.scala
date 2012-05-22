@@ -12,6 +12,17 @@ object MessageExamples {
 
   case class IrcExample(str: String, msg: Message)
 
+  val difficultExamples =
+    Seq(
+      IrcExample(
+        "command " + (1 to 16).mkString(" "),
+        RowMessage(
+          None,
+          "command",
+          (1 to 14) map {_.toString()},
+          Some("15 16")))
+    )
+  
   val examples =
     Seq(
       IrcExample(
@@ -21,13 +32,6 @@ object MessageExamples {
           "command",
           Seq("1", "2", "3", "4"))),
 
-      IrcExample(
-        "command " + (1 to 16).mkString(" "),
-        RowMessage(
-          None,
-          "command",
-          (1 to 14) map {_.toString()},
-          Some("15 16"))),
 
       IrcExample(
         ":nickname!user@host command 1 2 3 4 :a b c",
@@ -37,6 +41,7 @@ object MessageExamples {
           Seq("1", "2", "3", "4"), Some("a b c"))),
 
       IrcExample("PASS abc123", Password("abc123")),
+	  IrcExample(":servername PASS avc124", Password("avc124", Some(SimplePrefix("servername")))),
       IrcExample("NICK myNick", Nick("myNick"))
     )
 
