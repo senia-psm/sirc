@@ -17,7 +17,7 @@ object Parser extends JavaTokenParsers{
     case _ => as.length + cs.length < 8
   }
 
-  def message: Parser[Message] = opt(":" ~> prefix) ~ command ~ params ^^ { case p ~ c ~ par => RowMessage(p, c, par)}
+  def message: Parser[Message] = opt(":" ~> prefix) ~ command ~ params ^^ { case p ~ c ~ par => RawMessage(p, c, par)}
   def command: Parser[String] = """[A-Za-z]{1,}""".r | """\d{3}""".r
   def prefix: Parser[Prefix] = servername <~ " " | fullNickname <~ " "
   def servername: Parser[SimplePrefix] = hostname ^^ SimplePrefix

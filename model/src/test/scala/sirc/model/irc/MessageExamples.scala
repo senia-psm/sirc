@@ -6,8 +6,7 @@
 
 package sirc.model.irc
 
-import sirc.model.irc.MessageExamples.IrcExample
-
+import sirc.model.irc.KnownMessage._
 object MessageExamples {
 
   case class IrcExample(str: String, msg: Message)
@@ -16,10 +15,10 @@ object MessageExamples {
     Seq(
       IrcExample(
         "command " + (1 to 16).mkString(" "),
-        RowMessage(
+        RawMessage(
           None,
           "command",
-          (1 to 14) map {_.toString()},
+          (1 to 14) map {_.toString},
           Some("15 16")))
     )
   
@@ -27,7 +26,7 @@ object MessageExamples {
     Seq(
       IrcExample(
         ":nickname!user@host command 1 2 3 4",
-        RowMessage(
+        RawMessage(
           Some(Nickname("nickname", Some("user"), Some("host"))),
           "command",
           Seq("1", "2", "3", "4"))),
@@ -35,7 +34,7 @@ object MessageExamples {
 
       IrcExample(
         ":nickname!user@host command 1 2 3 4 :a b c",
-        RowMessage(
+        RawMessage(
           Some(Nickname("nickname", Some("user"), Some("host"))),
           "command",
           Seq("1", "2", "3", "4"), Some("a b c"))),

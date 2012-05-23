@@ -34,7 +34,7 @@ class ParserSpec extends FunSpec with ShouldMatchers {
 
     it("should parse correctly") {
       for (example <- MessageExamples.examples)
-        assert(Parser(example.str).get === RowMessage(example.msg.inner))
+        assert(Parser(example.str).get === RawMessage(example.msg.inner))
     }
 
     it("should parse result of 'toIrc' method") {
@@ -44,7 +44,7 @@ class ParserSpec extends FunSpec with ShouldMatchers {
 
     it("should generate same message from result of 'toIrc' method") {
       for (example <- MessageExamples.examples)
-        assert(Parser(example.msg.toIrc).get === RowMessage(example.msg.inner))
+        assert(Parser(example.msg.toIrc).get === RawMessage(example.msg.inner))
     }
 
     it("should make coffee") (pending)
