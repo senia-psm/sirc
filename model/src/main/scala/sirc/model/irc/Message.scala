@@ -1054,7 +1054,11 @@ case class Connect(target: String, port: Int, remoteServer: Option[String], pref
  * 
  *    TRACE *.oulu.fi                 ; TRACE to a server matching
  *                                    *.oulu.fi
- * 
+ * */
+case class Trace(target: Option[String] = None, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "TRACE", target ++: Nil)
+
+/**
  * 3.4.9 Admin command
  * 
  *       Command: ADMIN
@@ -1080,7 +1084,11 @@ case class Connect(target: String, port: Int, remoteServer: Option[String], pref
  * 
  *    ADMIN syrk                      ; ADMIN request for the server to
  *                                    which the user syrk is connected
- * 
+ * */
+case class Admin(target: Option[String] = None, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "ADMIN", target ++: Nil)
+
+/**
  * 3.4.10 Info command
  * 
  *       Command: INFO
@@ -1105,12 +1113,11 @@ case class Connect(target: String, port: Int, remoteServer: Option[String], pref
  * 
  *    INFO Angel                      ; request info from the server that
  *                                    Angel is connected to.
- * 
- * 3.5 Service Query and Commands
- * 
- *    The service query group of commands has been designed to return
- *    information about any service which is connected to the network.
- * 
+ * */
+case class Info(target: Option[String] = None, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "INFO", target ++: Nil)
+
+/**
  * 3.5.1 Servlist message
  * 
  *       Command: SERVLIST
@@ -1124,7 +1131,11 @@ case class Connect(target: String, port: Int, remoteServer: Option[String], pref
  *    Numeric Replies:
  * 
  *            RPL_SERVLIST                  RPL_SERVLISTEND
- * 
+ * */
+case class Servlist(mask: Option[String] = None, servType: Option[String] = None, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "SERVLIST", servType.map{Seq(_, mask.get)}.getOrElse(mask.seq) ++: Nil)
+
+/**
  * 3.5.2 Squery
  * 
  *       Command: SQUERY
@@ -1145,19 +1156,11 @@ case class Connect(target: String, port: Int, remoteServer: Option[String], pref
  *    SQUERY dict@irc.fr :fr2en blaireau
  *                                    ; Message to the service with name
  *                                    dict@irc.fr.
- * 
- * 3.6 User based queries
- * 
- *    User queries are a group of commands which are primarily concerned
- *    with finding details on a particular user or group users.  When using
- *    wildcards with any of these commands, if they match, they will only
- *    return information on users who are 'visible' to you.  The visibility
- *    of a user is determined as a combination of the user's mode and the
- *    common set of channels you are both on.
- * 
- *    Although services SHOULD NOT be using this class of message, they are
- *    allowed to.
- * 
+ * */
+case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "SQUERY", serviceName :: Nil, text)
+
+/**
  * 3.6.1 Who query
  * 
  *       Command: WHO

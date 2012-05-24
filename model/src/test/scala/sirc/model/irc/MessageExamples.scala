@@ -6,7 +6,6 @@
 
 package sirc.model.irc
 
-import sirc.model.irc.KnownMessage._
 object MessageExamples {
 
   case class IrcExample(str: String, msg: Message)
