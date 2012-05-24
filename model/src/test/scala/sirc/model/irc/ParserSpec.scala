@@ -46,7 +46,5 @@ class ParserSpec extends FunSpec with ShouldMatchers {
       for (example <- MessageExamples.examples)
         assert(Parser(example.msg.toIrc).get === RawMessage(example.msg.inner))
     }
-
-    it("should make coffee") (pending)
   }
 }

@@ -44,7 +44,12 @@ sealed abstract class KnownMessage(prefix: Option[Prefix],
                                    command: String,
                                    params: Seq[String],
                                    lastParam: Option[String] = None)
-  extends Message(prefix, command, params, lastParam)
+  extends Message(prefix, command, params, lastParam) {
+  def this(prefix: Option[Prefix],
+           command: String,
+           params: Seq[String],
+           lastParam: String) = this(prefix, command, params, Some(lastParam))
+}
 
 
 /**
@@ -133,7 +138,7 @@ case class User(user: String,
                 realName: String,
                 prefix: Option[Prefix] = None,
                 unused: Option[String] = None)
-  extends KnownMessage(prefix, "USER", user :: mode :: unused.getOrElse("*") :: Nil, Some(realName))
+  extends KnownMessage(prefix, "USER", user :: mode :: unused.getOrElse("*") :: Nil, realName)
 
 /**
  * 3.1.4 Oper message
@@ -267,7 +272,7 @@ case class Service(nickname: String,
                    reserved: String = "*",
                    reserved2: String = "0",
                    prefix: Option[Prefix] = None)
-  extends KnownMessage(prefix, "SERVICE", nickname :: reserved :: distribution :: servType :: reserved2 :: Nil, Some(info))
+  extends KnownMessage(prefix, "SERVICE", nickname :: reserved :: distribution :: servType :: reserved2 :: Nil, info)
 
 /**
  * 3.1.7 Quit
@@ -327,7 +332,7 @@ case class Quit(quitMessage: Option[String] = None, prefix: Option[Prefix] = Non
  *                                    comment "Server out of control".
  * */
 case class SQuit(server: SimplePrefix, comment: String, prefix: Option[Prefix] = None)
-  extends KnownMessage(prefix, "SQUIT", server.toIrc :: Nil, Some(comment))
+  extends KnownMessage(prefix, "SQUIT", server.toIrc :: Nil, comment)
 
 /** leave all channels
  * 3.2.1 Join message
@@ -771,7 +776,7 @@ case class Kick(channels: Seq[String], users: Seq[String], comment: Option[Strin
  *                                    *.edu.
  * */
 case class Privmsg(target: String, text: String, prefix: Option[Prefix] = None)
-  extends KnownMessage(prefix, "PRIVMSG", target :: Nil, Some(text))
+  extends KnownMessage(prefix, "PRIVMSG", target :: Nil, text)
 
 /**
  * 3.3.2 Notice
@@ -796,7 +801,7 @@ case class Privmsg(target: String, text: String, prefix: Option[Prefix] = None)
  *    See PRIVMSG for more details on replies and examples.
  * */
 case class Notice(target: String, text: String, prefix: Option[Prefix] = None)
-  extends KnownMessage(prefix, "NOTICE", target :: Nil, Some(text))
+  extends KnownMessage(prefix, "NOTICE", target :: Nil, text)
 
 /**
  * 3.4.1 Motd message
@@ -1195,7 +1200,7 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  *                                    operator.
  * */
 case class Who(mask: Option[String] = None, onlyOperators: Boolean, prefix: Option[Prefix] = None)
-  extends KnownMessage(prefix, "WHO", if (onlyOperators) mask :: "o" :: Nil else mask ++: Nil)
+  extends KnownMessage(prefix, "WHO", if (onlyOperators) mask.get :: "o" :: Nil else mask ++: Nil)
 
 /**
  * 3.6.2 Whois query
@@ -1437,7 +1442,7 @@ case class Pong(server1: String, server2: Option[String], prefix: Option[Prefix]
  *                                    sent to user WiZ on the other server.
  * */
 case class Error(errorMessage: String, prefix: Option[Prefix] = None)
-  extends KnownMessage(prefix, "ERROR", Nil, Some(errorMessage))
+  extends KnownMessage(prefix, "ERROR", Nil, errorMessage)
 
 /**
  * 4. Optional features
@@ -1595,7 +1600,7 @@ case class Restart(prefix: Option[Prefix] = None)
  *                                    running.
  * */
 case class Summon(user: String, target: Option[String] = None, channel: Option[String] = None, prefix: Option[Prefix] = None)
-  extends KnownMessage(prefix, "SUMMON", user :: channel.map{ Seq(target.get, _) }.getOrElse(target.seq))
+  extends KnownMessage(prefix, "SUMMON", user :: channel.map{ Seq(target.get, _) }.getOrElse(target.seq) ++: Nil)
 
 /**
  * 4.6 Users
@@ -1630,7 +1635,7 @@ case class Summon(user: String, target: Option[String] = None, channel: Option[S
  *                                    on server eff.org
  * */
 case class Users(target: Option[String] = None, prefix: Option[Prefix] = None)
-  extends KnownMessage(prefix, "USERS", target)
+  extends KnownMessage(prefix, "USERS", target.toList)
 
 /**
  * 4.7 Operwall message
@@ -1659,7 +1664,7 @@ case class Users(target: Option[String] = None, prefix: Option[Prefix] = None)
  *                                    CONNECT message it received from
  *                                    Joshua and acted upon.
  * */
-case class Users(text: String, prefix: Option[Prefix] = None) extends KnownMessage(prefix, "WALLOPS", Nil, Some(text))
+case class Wallops(text: String, prefix: Option[Prefix] = None) extends KnownMessage(prefix, "WALLOPS", Nil, text)
 
 /**
  * 4.8 Userhost message
