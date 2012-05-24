@@ -1193,7 +1193,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  *    WHO jto* o                      ; Command to list all users with a
  *                                    match against "jto*" if they are an
  *                                    operator.
- * 
+ * */
+case class Who(mask: Option[String] = None, onlyOperators: Boolean, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "WHO", if (onlyOperators) mask :: "o" :: Nil else mask ++: Nil)
+
+/**
  * 3.6.2 Whois query
  * 
  *       Command: WHOIS
@@ -1230,7 +1234,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  * 
  *    WHOIS eff.org trillian          ; ask server eff.org for user
  *                                    information  about trillian
- * 
+ * */
+case class Whois(masks: Seq[String], target: Option[String] = None, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "WHOIS", target ++: (masks.mkString(",") :: Nil))
+
+/**
  * 3.6.3 Whowas
  * 
  *       Command: WHOWAS
@@ -1266,7 +1274,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  *    WHOWAS Trillian 1 *.edu         ; return the most recent history for
  *                                    "Trillian" from the first server
  *                                    found to match "*.edu".
- * 
+ * */
+case class Whowas(nicknames: Seq[String], count: Option[Int] = None, target: Option[String] = None, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "WHOWAS", nicknames.mkString(",") :: target.map{ Seq(count.get.toString, _) }.getOrElse(count.map{_.toString}.seq) ++: Nil)
+
+/**
  * 3.7 Miscellaneous messages
  * 
  *    Messages in this category do not fit into any of the above categories
@@ -1323,7 +1335,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  *    controversies over the years, and along with the above
  *    recommendation, it is also widely recognized that not even operators
  *    should be allowed to kill users on remote servers.
- * 
+ * */
+case class Kill(nickname: String, comment: String, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "KILL", nickname :: Nil, comment)
+
+/**
  * 3.7.2 Ping message
  * 
  *       Command: PING
@@ -1356,7 +1372,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  * 
  *    PING :irc.funet.fi              ; Ping message sent by server
  *                                    "irc.funet.fi"
- * 
+ * */
+case class Ping(server1: String, server2: Option[String], prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "PING", server1 :: server2 ++: Nil)
+
+/**
  * 3.7.3 Pong message
  * 
  *       Command: PONG
@@ -1375,7 +1395,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  * 
  *    PONG csd.bu.edu tolsun.oulu.fi  ; PONG message from csd.bu.edu to
  *                                    tolsun.oulu.fi
- * 
+ * */
+case class Pong(server1: String, server2: Option[String], prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "PONG", server1 :: server2 ++: Nil)
+
+/**
  * 3.7.4 Error
  * 
  *       Command: ERROR
@@ -1411,7 +1435,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  *    NOTICE WiZ :ERROR from csd.bu.edu -- Server *.fi already exists
  *                                    ; Same ERROR message as above but
  *                                    sent to user WiZ on the other server.
- * 
+ * */
+case class Error(errorMessage: String, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "ERROR", Nil, Some(errorMessage))
+
+/**
  * 4. Optional features
  * 
  *    This section describes OPTIONAL messages.  They are not required in a
@@ -1453,7 +1481,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  * 
  *    AWAY :Gone to lunch.  Back in 5 ; Command to set away message to
  *                                    "Gone to lunch.  Back in 5".
- * 
+ * */
+case class Away(text: Option[String] = None, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "AWAY", Nil, text)
+
+/**
  * 4.2 Rehash message
  * 
  *       Command: REHASH
@@ -1473,7 +1505,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  *    REHASH                          ; message from user with operator
  *                                    status to server asking it to reread
  *                                    its configuration file.
- * 
+ * */
+case class Rehash(prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "REHASH", Nil)
+
+/**
  * 4.3 Die message
  * 
  *       Command: DIE
@@ -1495,7 +1531,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  *    Example:
  * 
  *    DIE                             ; no parameters required.
- * 
+ * */
+case class Die(prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "DIE", Nil)
+
+/**
  * 4.4 Restart message
  * 
  *       Command: RESTART
@@ -1517,7 +1557,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  *    Example:
  * 
  *    RESTART                         ; no parameters required.
- * 
+ * */
+case class Restart(prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "RESTART", Nil)
+
+/**
  * 4.5 Summon message
  * 
  *       Command: SUMMON
@@ -1549,7 +1593,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  *    SUMMON jto tolsun.oulu.fi       ; summon user jto on the host which a
  *                                    server named "tolsun.oulu.fi" is
  *                                    running.
- * 
+ * */
+case class Summon(user: String, target: Option[String] = None, channel: Option[String] = None, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "SUMMON", user :: channel.map{ Seq(target.get, _) }.getOrElse(target.seq))
+
+/**
  * 4.6 Users
  * 
  *       Command: USERS
@@ -1580,7 +1628,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  * 
  *    USERS eff.org                   ; request a list of users logged in
  *                                    on server eff.org
- * 
+ * */
+case class Users(target: Option[String] = None, prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "USERS", target)
+
+/**
  * 4.7 Operwall message
  * 
  *       Command: WALLOPS
@@ -1606,7 +1658,10 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  *                                    message from csd.bu.edu announcing a
  *                                    CONNECT message it received from
  *                                    Joshua and acted upon.
- * 
+ * */
+case class Users(text: String, prefix: Option[Prefix] = None) extends KnownMessage(prefix, "WALLOPS", Nil, Some(text))
+
+/**
  * 4.8 Userhost message
  * 
  *       Command: USERHOST
@@ -1628,7 +1683,11 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  * 
  *    :ircd.stealth.net 302 yournick :syrk=+syrk@millennium.stealth.net
  *                                    ; Reply for user syrk
- * 
+ * */
+case class Userhost(nicknames: Seq[String], prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "USERHOST", nicknames)
+
+/**
  * 4.9 Ison message
  * 
  *       Command: ISON
@@ -1660,3 +1719,5 @@ case class SQuery(serviceName: String, text: String, prefix: Option[Prefix] = No
  *    ISON phone trillian WiZ jarlek Avalon Angel Monstah syrk
  *                                    ; Sample ISON request for 7 nicks.
  * */
+case class IsOn(nicknames: Seq[String], prefix: Option[Prefix] = None)
+  extends KnownMessage(prefix, "ISON", nicknames.take(14), nicknames.drop(14).reduceLeftOption{ (s, e) => s + " " + e})
