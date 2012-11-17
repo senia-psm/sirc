@@ -520,7 +520,7 @@ case class Part(channels: Seq[String], text: Option[String] = None, prefix: Opti
  *                                    creator for "!12345ircd" is
  * */
 case class ChannelMode(channel: String, modes: Seq[(Boolean, ChanMode, Option[String])], prefix: Option[Prefix] = None)
-  extends KnownMessage(prefix, "MODE", modes.flatMap(m => ((if (m._1) "+" else "-") + m._2.toIrc) :: m._3.toList ))
+  extends KnownMessage(prefix, "MODE", channel +: modes.flatMap(m => ((if (m._1) "+" else "-") + m._2.toIrc) :: m._3.toList ))
 
 /**
  * 3.2.4 Topic message
